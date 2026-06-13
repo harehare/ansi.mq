@@ -1,0 +1,118 @@
+# ANSI terminal escape code utilities for mq
+
+def _ansi_esc(): implode([27]);
+
+def _ansi_wrap(code, s):
+  _ansi_esc() + "[" + to_string(code) + "m" + to_string(s) + _ansi_esc() + "[0m"
+end
+
+# Applies bold formatting.
+def ansi_bold(s): _ansi_wrap(1, s);
+
+# Applies dim (faint) formatting.
+def ansi_dim(s): _ansi_wrap(2, s);
+
+# Applies italic formatting.
+def ansi_italic(s): _ansi_wrap(3, s);
+
+# Applies underline formatting.
+def ansi_underline(s): _ansi_wrap(4, s);
+
+# Applies strikethrough formatting.
+def ansi_strikethrough(s): _ansi_wrap(9, s);
+
+# Applies red foreground color.
+def ansi_red(s): _ansi_wrap(31, s);
+
+# Applies green foreground color.
+def ansi_green(s): _ansi_wrap(32, s);
+
+# Applies yellow foreground color.
+def ansi_yellow(s): _ansi_wrap(33, s);
+
+# Applies blue foreground color.
+def ansi_blue(s): _ansi_wrap(34, s);
+
+# Applies magenta foreground color.
+def ansi_magenta(s): _ansi_wrap(35, s);
+
+# Applies cyan foreground color.
+def ansi_cyan(s): _ansi_wrap(36, s);
+
+# Applies white foreground color.
+def ansi_white(s): _ansi_wrap(37, s);
+
+# Applies bright red foreground color.
+def ansi_bright_red(s): _ansi_wrap(91, s);
+
+# Applies bright green foreground color.
+def ansi_bright_green(s): _ansi_wrap(92, s);
+
+# Applies bright yellow foreground color.
+def ansi_bright_yellow(s): _ansi_wrap(93, s);
+
+# Applies bright blue foreground color.
+def ansi_bright_blue(s): _ansi_wrap(94, s);
+
+# Applies bright magenta foreground color.
+def ansi_bright_magenta(s): _ansi_wrap(95, s);
+
+# Applies bright cyan foreground color.
+def ansi_bright_cyan(s): _ansi_wrap(96, s);
+
+# Applies bright white foreground color.
+def ansi_bright_white(s): _ansi_wrap(97, s);
+
+# Applies red background color.
+def ansi_bg_red(s): _ansi_wrap(41, s);
+
+# Applies green background color.
+def ansi_bg_green(s): _ansi_wrap(42, s);
+
+# Applies yellow background color.
+def ansi_bg_yellow(s): _ansi_wrap(43, s);
+
+# Applies blue background color.
+def ansi_bg_blue(s): _ansi_wrap(44, s);
+
+# Applies magenta background color.
+def ansi_bg_magenta(s): _ansi_wrap(45, s);
+
+# Applies cyan background color.
+def ansi_bg_cyan(s): _ansi_wrap(46, s);
+
+# Applies white background color.
+def ansi_bg_white(s): _ansi_wrap(47, s);
+
+# Applies a 24-bit RGB foreground color.
+def ansi_rgb(s, r, g, b):
+  _ansi_esc() + "[38;2;" + to_string(r) + ";" + to_string(g) + ";" + to_string(b) + "m" +
+  to_string(s) +
+  _ansi_esc() + "[0m"
+end
+
+# Applies a 24-bit RGB background color.
+def ansi_bg_rgb(s, r, g, b):
+  _ansi_esc() + "[48;2;" + to_string(r) + ";" + to_string(g) + ";" + to_string(b) + "m" +
+  to_string(s) +
+  _ansi_esc() + "[0m"
+end
+
+# Strips all ANSI escape codes from a string.
+def ansi_strip(s):
+  let esc = _ansi_esc()
+  | var result = to_string(s)
+  | let _ = while (contains(result, esc)):
+      let pos = index(result, esc)
+      | let rest = slice(result, pos + 1, len(result))
+      | let m_pos = index(rest, "m")
+      | if (m_pos == -1):
+          result = slice(result, 0, pos) + slice(result, pos + 1, len(result))
+        else:
+          result = slice(result, 0, pos) + slice(rest, m_pos + 1, len(rest))
+    end
+  | result
+end
+
+# Returns the visible length of a string (excluding ANSI escape codes).
+def ansi_len(s): len(ansi_strip(s));

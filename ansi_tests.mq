@@ -1,0 +1,194 @@
+include "test"
+| include "ansi"
+|
+
+def _esc(): implode([27]);
+
+# -- Style Tests --
+
+def test_bold_contains_code():
+  let result = ansi_bold("hello")
+  | assert_true(contains(result, "[1m"))
+  | assert_true(contains(result, "hello"))
+  | assert_true(contains(result, "[0m"))
+end
+
+def test_dim():
+  let result = ansi_dim("x")
+  | assert_true(contains(result, "[2m"))
+  | assert_true(contains(result, "x"))
+end
+
+def test_italic():
+  let result = ansi_italic("x")
+  | assert_true(contains(result, "[3m"))
+end
+
+def test_underline():
+  let result = ansi_underline("x")
+  | assert_true(contains(result, "[4m"))
+end
+
+def test_strikethrough():
+  let result = ansi_strikethrough("x")
+  | assert_true(contains(result, "[9m"))
+end
+
+# -- Foreground Color Tests --
+
+def test_red():
+  let result = ansi_red("x")
+  | assert_true(contains(result, "[31m"))
+  | assert_true(contains(result, "x"))
+end
+
+def test_green():
+  let result = ansi_green("x")
+  | assert_true(contains(result, "[32m"))
+end
+
+def test_yellow():
+  let result = ansi_yellow("x")
+  | assert_true(contains(result, "[33m"))
+end
+
+def test_blue():
+  let result = ansi_blue("x")
+  | assert_true(contains(result, "[34m"))
+end
+
+def test_magenta():
+  let result = ansi_magenta("x")
+  | assert_true(contains(result, "[35m"))
+end
+
+def test_cyan():
+  let result = ansi_cyan("x")
+  | assert_true(contains(result, "[36m"))
+end
+
+def test_white():
+  let result = ansi_white("x")
+  | assert_true(contains(result, "[37m"))
+end
+
+# -- Bright Color Tests --
+
+def test_bright_red():
+  let result = ansi_bright_red("x")
+  | assert_true(contains(result, "[91m"))
+end
+
+def test_bright_green():
+  let result = ansi_bright_green("x")
+  | assert_true(contains(result, "[92m"))
+end
+
+# -- Background Color Tests --
+
+def test_bg_red():
+  let result = ansi_bg_red("x")
+  | assert_true(contains(result, "[41m"))
+end
+
+def test_bg_green():
+  let result = ansi_bg_green("x")
+  | assert_true(contains(result, "[42m"))
+end
+
+def test_bg_blue():
+  let result = ansi_bg_blue("x")
+  | assert_true(contains(result, "[44m"))
+end
+
+# -- RGB Tests --
+
+def test_rgb_foreground():
+  let result = ansi_rgb("hello", 255, 128, 0)
+  | assert_true(contains(result, "[38;2;255;128;0m"))
+  | assert_true(contains(result, "hello"))
+  | assert_true(contains(result, "[0m"))
+end
+
+def test_rgb_background():
+  let result = ansi_bg_rgb("hello", 0, 128, 255)
+  | assert_true(contains(result, "[48;2;0;128;255m"))
+  | assert_true(contains(result, "hello"))
+end
+
+def test_rgb_black():
+  let result = ansi_rgb("x", 0, 0, 0)
+  | assert_true(contains(result, "[38;2;0;0;0m"))
+end
+
+# -- ansi_strip Tests --
+
+def test_strip_bold():
+  let colored = ansi_bold("hello")
+  | let result = ansi_strip(colored)
+  | assert_eq(result, "hello")
+end
+
+def test_strip_red():
+  let colored = ansi_red("world")
+  | let result = ansi_strip(colored)
+  | assert_eq(result, "world")
+end
+
+def test_strip_rgb():
+  let colored = ansi_rgb("test", 255, 0, 0)
+  | let result = ansi_strip(colored)
+  | assert_eq(result, "test")
+end
+
+def test_strip_no_codes():
+  let result = ansi_strip("plain text")
+  | assert_eq(result, "plain text")
+end
+
+def test_strip_multiple_codes():
+  let colored = ansi_bold("a") + " " + ansi_red("b") + " " + ansi_green("c")
+  | let result = ansi_strip(colored)
+  | assert_eq(result, "a b c")
+end
+
+def test_strip_empty():
+  let result = ansi_strip("")
+  | assert_eq(result, "")
+end
+
+# -- ansi_len Tests --
+
+def test_len_plain():
+  let result = ansi_len("hello")
+  | assert_eq(result, 5)
+end
+
+def test_len_with_codes():
+  let colored = ansi_bold("hello")
+  | let result = ansi_len(colored)
+  | assert_eq(result, 5)
+end
+
+def test_len_mixed():
+  let s = ansi_red("abc") + " " + ansi_green("de")
+  | let result = ansi_len(s)
+  | assert_eq(result, 6)
+end
+
+# -- Wrap Structure Tests --
+
+def test_wrap_starts_with_esc():
+  let result = ansi_red("x")
+  | assert_true(starts_with(result, _esc()))
+end
+
+def test_wrap_ends_with_reset():
+  let result = ansi_red("x")
+  | assert_true(ends_with(result, "[0m"))
+end
+
+def test_wrap_contains_text():
+  let result = ansi_cyan("my text")
+  | assert_true(contains(result, "my text"))
+end
