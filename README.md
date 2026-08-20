@@ -21,16 +21,16 @@ cp ansi.mq ~/.mq/
 
 ### HTTP Import (no local installation needed)
 
-If `mq` was built with the `http-import` feature, you can import directly from GitHub without any local setup:
+If `mq` was built with the `http-import` feature, you can import directly from GitHub without any local setup. This requires the `--allow-http-import` flag, which is disabled by default:
 
 ```sh
-mq -I raw 'import "github.com/harehare/ansi.mq" | ansi::ansi_green("✓ OK")' input.md
+mq --allow-http-import -I raw 'import "github.com/harehare/ansi.mq" | ansi::ansi_green("✓ OK")' input.md
 ```
 
 Pin to a specific release with `@vX.Y.Z`:
 
 ```sh
-mq -I raw 'import "github.com/harehare/ansi.mq@v1.0.0" | ansi::ansi_green("✓ OK")' input.md
+mq --allow-http-import -I raw 'import "github.com/harehare/ansi.mq@v1.0.0" | ansi::ansi_green("✓ OK")' input.md
 ```
 
 ## Usage
